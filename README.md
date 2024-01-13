@@ -1,5 +1,5 @@
 # The UGLY-MAXIMAL  
-Not attractive nor pretty font seemly for 5x5 display.
+Not attractive nor pretty font. Seemly for 5x5 display.
 
 #### Presentation
 ![Font show](https://github.com/bravequickcleverfibreyarn/ug_max/blob/main/pre/ug-max-presentation.gif)
