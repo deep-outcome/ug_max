@@ -6,5 +6,5 @@ authors     = [ "software9119.technology" ]
 license     = "MIT"
 description = "Down-top left-right defined font seemly design for 5x5 display."
 repository  = "https://github.com/bravequickcleverfibreyarn/ug_max"
-keywords    = [ "font", "micro:bit", "5x5" ]
+keywords    = [ "font", "microbit", "5x5" ]
 categories  = [ "embedded development" ]
