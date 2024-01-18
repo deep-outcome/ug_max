@@ -2,9 +2,9 @@
 Not attractive nor pretty font. Seemly for 5x5 display.
 
 #### Presentation
-![Font show](https://github.com/bravequickcleverfibreyarn/ug_max/blob/main/pre/ug-max-presentation.gif)
+![AZ09](https://github.com/bravequickcleverfibreyarn/ug_max/blob/main/pre/AZ09.png)
 
-![Font show](http://software9119.technology/figure/sw9119.technology.gif)
+For show on micro:bit v2 see [ug-max-presentation.gif](https://github.com/bravequickcleverfibreyarn/ug_max/blob/main/pre/ug-max-presentation.gif).
 
 #### Usage sample
 For usage sample check with https://github.com/bravequickcleverfibreyarn/mcu_chats_with_you.
