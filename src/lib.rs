@@ -1,7 +1,12 @@
 #![no_std]
-/// UGLY-MAXIMAL (the name) font.
+//! UGLY-MAXIMAL font.
+//!
+//! Each character representation is defined as series of columns consisting of 5 bits
+//! at maximum. Bits are ordered down-top and columns left-right. So 0 index bit of 0 index column
+//! is top left corner. For example, for 0x1e = 0b11_110 which is 1ˢᵗ column of A this is `0`.
 
 #[rustfmt::skip]
+/// English alphabet. 26 letters.
 pub const LETTERS: [&[u8]; 26] = 
 [ 
  /*A*/   & [0x1e, 0x9, 0x9, 0x9, 0x1e], 
@@ -33,6 +38,7 @@ pub const LETTERS: [&[u8]; 26] =
 ];
 
 #[rustfmt::skip]
+/// From '0' to '9'.
 pub const DIGITS: [[u8; 4]; 10] = 
 [
 /*0*/   [0x1f, 0x11, 0x11, 0x1f],
@@ -48,6 +54,7 @@ pub const DIGITS: [[u8; 4]; 10] =
 ];
 
 #[rustfmt::skip]
+/// Set of chosen symbols.
 pub const SYMBOLS: [&[u8]; 4] = 
 [
   /* ! */ & [0x17], 
@@ -56,10 +63,16 @@ pub const SYMBOLS: [&[u8]; 4] =
   /* - */ & [0x4, 0x4, 0x4],  
 ];
 
+/// Special matrix for unsupported `char` mapping.
 pub const UNSUPPORTED: [u8; 5] = [0x11, 0x13, 0x15, 0x19, 0x11];
+/// One column of '0's.
 pub const SPACING: [u8; 1] = [0u8; 1];
 
-pub fn col_defs(text: &str, out: &mut [&[u8]]) {
+/// Provides mappings for input `text` into 5x5 matrixes.
+/// Each `char` is followed by `SPACING`. Whole `text` is optinally followed
+/// by `final_sp` count of `SPACING`s.
+/// For details see `col_def`.
+pub fn col_defs(text: &str, final_sp: usize, out: &mut [&[u8]]) {
     let mut ix = 0;
     for c in text.chars() {
         out[ix] = col_def(c);
@@ -68,12 +81,16 @@ pub fn col_defs(text: &str, out: &mut [&[u8]]) {
         ix += 1;
     }
 
-    for _ in 0..4 {
+    for _ in 0..final_sp {
         out[ix] = &SPACING;
         ix += 1;
     }
 }
 
+/// Provides `c` into 5×5 matrix defined projection.
+/// Some `char`s are unsuitable for exact 5×5 representation.
+/// For instance '!' which is only 1 column wide.
+/// All letters are capitalized.
 pub fn col_def(mut c: char) -> &'static [u8] {
     if c.is_ascii() {
         if c.is_lowercase() {
