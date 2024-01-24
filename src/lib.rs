@@ -69,14 +69,27 @@ pub const UNSUPPORTED: [u8; 5] = [0x11, 0x13, 0x15, 0x19, 0x11];
 pub const SPACING: [u8; 1] = [0u8; 1];
 
 /// Provides mappings for input `text` into 5x5 matrixes.
-/// Each `char` is followed by `SPACING`. Whole `text` is optinally followed
-/// by `final_sp` count of `SPACING`s.
+/// Each `char` mapping is followed by `SPACING` with exception for last one.
+/// Whole `text` is optinally followed by `final_sp` count of `SPACING`s.
 /// For details see `col_def`.
 pub fn col_defs(text: &str, final_sp: usize, out: &mut [&[u8]]) {
+    if text.len() == 0 {
+        return;
+    }
+
     let mut ix = 0;
-    for c in text.chars() {
-        out[ix] = col_def(c);
+    let mut chars = text.chars();
+    let mut c = chars.next();
+
+    loop {
+        out[ix] = col_def(c.unwrap());
         ix += 1;
+
+        c = chars.next();
+        if c.is_none() {
+            break;
+        }
+
         out[ix] = &SPACING;
         ix += 1;
     }
@@ -113,5 +126,87 @@ pub fn col_def(mut c: char) -> &'static [u8] {
         ' ' => SYMBOLS[2],
         '-' => SYMBOLS[3],
         _ => &UNSUPPORTED,
+    }
+}
+
+#[cfg(test)]
+mod tests_of_units {
+    use super::{col_defs, DIGITS, LETTERS, SPACING, SYMBOLS, UNSUPPORTED};
+
+    #[test]
+    fn letters_symbols() {
+        let alphabet1 = "abcdefghijklmnopqrstuvwxyz";
+        let alphabet2 = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+        let symbols = "!. -";
+
+        test::<51>(alphabet1, &LETTERS);
+        test::<51>(alphabet2, &LETTERS);
+        test::<7>(symbols, &SYMBOLS);
+
+        fn test<const OUTSIZE: usize>(source: &str, sample: &[&[u8]]) {
+            let boundary = sample.len() - 1;
+            let mut out = [&[0u8; 0] as &[u8]; OUTSIZE];
+
+            col_defs(&source, 0, &mut out);
+            let mut out_iter = out.into_iter();
+
+            for i in 0..=boundary {
+                let letter = sample[i];
+
+                let mut next = out_iter.next().unwrap();
+                assert_eq!(letter, next);
+
+                if i < boundary {
+                    next = out_iter.next().unwrap();
+                    assert_eq!(SPACING, next);
+                }
+            }
+
+            assert_eq!(None, out_iter.next());
+        }
+    }
+    #[test]
+    fn numbers() {
+        let numbers = "0123456789";
+
+        let mut out = [&[0u8; 0] as &[u8]; 19];
+
+        col_defs(&numbers, 0, &mut out);
+        let mut out_iter = out.into_iter();
+
+        for i in 0..10usize {
+            let digit = DIGITS[i];
+
+            let mut next = out_iter.next().unwrap();
+            assert_eq!(digit, next);
+
+            if i < 9 {
+                next = out_iter.next().unwrap();
+                assert_eq!(SPACING, next);
+            }
+        }
+
+        assert_eq!(None, out_iter.next());
+    }
+
+    #[test]
+    fn unsupported() {
+        let mut out = [&[0u8; 0] as &[u8]; 1];
+        let text = ">";
+
+        col_defs(&text, 0, &mut out);
+        assert_eq!(UNSUPPORTED, out[0]);
+    }
+
+    #[test]
+    fn final_spacing() {
+        let mut out = [&[0u8; 0] as &[u8]; 6];
+        let text = " ";
+
+        col_defs(&text, 5, &mut out);
+
+        for i in 1..6 {
+            assert_eq!(SPACING, out[i]);
+        }
     }
 }
