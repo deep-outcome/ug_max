@@ -55,12 +55,15 @@ pub const DIGITS: [[u8; 4]; 10] =
 
 #[rustfmt::skip]
 /// Set of chosen symbols.
-pub const SYMBOLS: [&[u8]; 4] = 
+pub const SYMBOLS: [&[u8]; 7] = 
 [
   /* ! */ & [0x17], 
   /* . */ & [0x10],
   /*   */ & [0x0],
   /* - */ & [0x4, 0x4, 0x4],  
+  /* = */ & [0xa, 0xa, 0xa],
+  /* # */ & [0xa, 0x1f, 0xa, 0x1f, 0xa],
+  /* + */ & [0x4, 0xe, 0x4],
 ];
 
 /// Special matrix for unsupported `char` mapping.
@@ -125,23 +128,42 @@ pub fn col_def(mut c: char) -> &'static [u8] {
         '.' => SYMBOLS[1],
         ' ' => SYMBOLS[2],
         '-' => SYMBOLS[3],
+        '=' => SYMBOLS[4],
+        '#' => SYMBOLS[5],
+        '+' => SYMBOLS[6],
         _ => &UNSUPPORTED,
     }
 }
 
+/// Computes expected buffer size for `text` provided.
+/// Goes with `str.len()` thus size is computed from size in 
+/// bytes not `char`s nor _graphemes_.
+///
+/// Supports _const_ context.
+/// ```
+/// use ug_max::buff_size;
+/// const TEXT: &str = "abc123";
+/// let buffer = [&[0u8; 0]; buff_size(TEXT)];
+/// assert_eq!(11, buffer.len());
+/// ```
+pub const fn buff_size(text: &str) -> usize {
+    let len = text.len();
+    len * 2 - 1
+}
+
 #[cfg(test)]
 mod tests_of_units {
-    use super::{col_defs, DIGITS, LETTERS, SPACING, SYMBOLS, UNSUPPORTED};
+    use super::{buff_size, col_defs, DIGITS, LETTERS, SPACING, SYMBOLS, UNSUPPORTED};
 
     #[test]
     fn letters_symbols() {
         let alphabet1 = "abcdefghijklmnopqrstuvwxyz";
         let alphabet2 = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
-        let symbols = "!. -";
+        let symbols = "!. -=#+";
 
         test::<51>(alphabet1, &LETTERS);
         test::<51>(alphabet2, &LETTERS);
-        test::<7>(symbols, &SYMBOLS);
+        test::<13>(symbols, &SYMBOLS);
 
         fn test<const OUTSIZE: usize>(source: &str, sample: &[&[u8]]) {
             let boundary = sample.len() - 1;
@@ -208,5 +230,19 @@ mod tests_of_units {
         for i in 1..6 {
             assert_eq!(SPACING, out[i]);
         }
+    }
+
+    #[test]
+    fn buff_size_const() {
+        const TEXT: &str = "abc123";
+
+        let buffer = [&[0u8; 0]; buff_size(TEXT)];
+        assert_eq!(11, buffer.len());
+    }
+
+    #[test]
+    fn buff_size_dynam() {
+        let text: &str = "abc123";
+        assert_eq!(11, buff_size(text));
     }
 }
