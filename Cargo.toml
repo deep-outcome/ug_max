@@ -1,6 +1,6 @@
 [package]
 name        = "ug_max"
-version     = "3.1.0"
+version     = "4.0.0"
 edition     = "2021"
 authors     = [ "software9119.technology" ]
 license     = "MIT"

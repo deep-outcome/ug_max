@@ -137,18 +137,18 @@ pub fn col_def(mut c: char) -> &'static [u8] {
 
 /// Computes expected buffer size for `text` provided.
 /// Goes with `str.len()` thus size is computed from size in 
-/// bytes not `char`s nor _graphemes_.
+/// bytes not `char`s nor _graphemes_. Optionally extends size with `extra`.
 ///
-/// Supports _const_ context.
+/// Supports _const_ context. 
 /// ```
 /// use ug_max::buff_size;
 /// const TEXT: &str = "abc123";
-/// let buffer = [&[0u8; 0]; buff_size(TEXT)];
+/// let buffer = [&[0u8; 0]; buff_size(TEXT, 0)];
 /// assert_eq!(11, buffer.len());
 /// ```
-pub const fn buff_size(text: &str) -> usize {
+pub const fn buff_size(text: &str, extra: usize) -> usize {
     let len = text.len();
-    len * 2 - 1
+    len * 2 - 1 + extra
 }
 
 #[cfg(test)]
@@ -236,13 +236,13 @@ mod tests_of_units {
     fn buff_size_const() {
         const TEXT: &str = "abc123";
 
-        let buffer = [&[0u8; 0]; buff_size(TEXT)];
-        assert_eq!(11, buffer.len());
+        let buffer = [&[0u8; 0]; buff_size(TEXT, 2)];
+        assert_eq!(13, buffer.len());
     }
 
     #[test]
     fn buff_size_dynam() {
         let text: &str = "abc123";
-        assert_eq!(11, buff_size(text));
+        assert_eq!(11, buff_size(text, 0));
     }
 }
