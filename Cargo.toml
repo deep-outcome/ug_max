@@ -1,11 +1,11 @@
 [package]
 name        = "ug_max"
-version     = "4.0.1"
+version     = "4.0.2"
 edition     = "2021"
 authors     = [ "software9119.technology" ]
 license     = "MIT"
 description = "Down-top left-right defined font. Seemly design for 5x5 display."
 repository  = "https://github.com/bravequickcleverfibreyarn/ug_max"
 keywords    = [ "font", "microbit", "5x5" ]
-categories  = [ "embedded development" ]
+categories  = [ "no-std", "no-std::no-alloc", "embedded" ]
 documentation = "https://docs.rs/ug_max/latest/ug_max/"
